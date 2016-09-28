@@ -1,0 +1,341 @@
+/**
+ * Required Information for Submission: 
+ * Brendan Zotto
+ * ID-110207876
+ * Homework Assignment 02
+ * CSE 214 Recitation 01
+ * Charles Chen
+ * Shilpi Bhattacharyya 
+ * @author Brendan
+ */
+
+public class Itinerary {
+	
+	private TripStopNode head;
+	private TripStopNode tail;
+	private TripStopNode cursor;
+	private TripStopNode dummy;// an empty node that only contains 
+								//a link to the first link
+	private TripStop dummyStop;
+	private int totalStops = 0;
+	private int cursorCount =0;// keeps track of cursor for printing summary
+	private int totalDist = 0;
+	
+	/**
+	 * Instantiates a new itinerary with a dummy node, and the head is set to the dummy node
+	 */
+	public Itinerary() {
+		
+		tail = null;
+		cursor = null;
+		dummyStop = new TripStop("",0,"");
+		dummy = new TripStopNode(dummyStop);
+		head = dummy;// sets head to static position, called dummy
+	}
+
+	/**
+	 * Gets the stops count.
+	 *
+	 * @return the stops count
+	 */
+	public int getStopsCount() {
+		return totalStops;
+	}
+
+	/**
+	 * Gets the total distance.
+	 *
+	 * @return the total distance
+	 */
+	public int getTotalDistance() {
+		return totalDist;
+	}
+	
+	/**
+	 * Sets the total distance.
+	 *
+	 * @param distance the new total distance
+	 */
+	public void setTotalDistance(int distance)
+	{
+		this.totalDist = distance;
+	}
+	
+	/**
+	 * Reset cursor to head.
+	 */
+	public void resetCursorToHead() {
+		if (dummy != null)
+			cursor = dummy.getNext();// resets cursor to node dummy points to, i.e. the first node in the list
+		else
+			cursor = null;
+	}
+	
+	/**
+	 * Move cursor to tail, if tail is null, cursor is also set to null
+	 */
+	public void moveCursorToTail() {
+		if (tail != null)
+			cursor = tail;// resets cursor to tail node
+		else
+			cursor = null;
+	}
+	
+	/**
+	 * Gets the cursor.
+	 *
+	 * @return the cursor
+	 * @throws IllegalArgumentException if cursor is defined as null
+	 */
+	public TripStopNode getCursor() throws IllegalArgumentException
+	{
+		if (cursor == null)
+		{
+			throw new IllegalArgumentException();
+		}
+		return cursor;
+	}
+	
+	/**
+	 * Gets the first node
+	 *
+	 * @return the first
+	 * @throws IllegalArgumentException if the first node is null
+	 */
+	public TripStopNode getFirst() throws IllegalArgumentException// ask about this
+	{
+		if (dummy.getNext() == null)//if list is empty
+		{
+			throw new IllegalArgumentException();
+		}
+		return dummy.getNext();//return first node NOT the dummy Node
+	}
+	
+	/**
+	 * Moves cursor foward.
+	 *
+	 * @throws EndOfItineraryException when cursor is equal to tail, i.e. cursor is at the end of the list.
+	 */
+	public void cursorFoward() throws EndOfItineraryException
+	{
+		if (cursor == tail) {
+			throw new EndOfItineraryException();
+		}
+		cursor = cursor.getNext();
+	}
+
+	/**
+	 * Moves cursor backward.
+	 *
+	 * @throws EndOfItineraryException when cursor equals the dummy head, i.e. at the head of the list.
+	 */
+	public void cursorBackward() throws EndOfItineraryException {
+		if (cursor == null || cursor.getPrev() == dummy ) {
+			throw new EndOfItineraryException();
+		}
+		cursor = cursor.getPrev();
+	}
+	
+	/**
+	 * Insert before cursor, does not destroy the data of the nodes, 
+	 * simply manipulates what the nodes of the cursor and its previous value point to.
+	 *
+	 * @param newStop the new stop
+	 * @throws IllegalArgumentException if the new stop is a null value.
+	 */
+	public void insertBeforeCursor(TripStop newStop) throws IllegalArgumentException
+	{
+	
+	if (newStop == null)//make sure data is present before adding to linked list
+	{
+		throw new IllegalArgumentException();
+	}
+	TripStopNode newNode = new TripStopNode(newStop);
+	if (cursor == null)
+	{
+		newNode.setPrev(dummy);
+		tail = newNode;
+		tail.setPrev(dummy);
+		dummy.setNext(newNode);
+		cursor = newNode;
+	}
+	else if (cursor == dummy)
+	{
+		/*
+		set newStop's previous as dummy,then sets its next to dummy's next
+		this ensures that the linked list is not destroyed from the insertion
+		then dummy's next is set to newStop
+	*/
+	
+		
+		newNode.setPrev(dummy);
+		newNode.setNext(dummy.getNext());
+		
+		if (dummy.getNext()!=null){
+			dummy.getNext().setPrev(newNode);
+		}
+		else {
+			dummy.setNext(newNode);
+		}
+		cursor = newNode;
+		if (newNode.getNext() == null)
+		{
+			tail = newNode;
+		}
+	}
+	
+	else
+	{
+		/*
+		 * set newStop's next to current cursor,
+		 * set newStop's previous to cursorsPrevious
+		 * this again ensures the linked list is not broken
+		 * set newStops previous's next value to newStop. 
+		 */
+		
+		newNode.setNext(cursor);
+		newNode.setPrev(cursor.getPrev());
+		newNode.getNext().setPrev(newNode);
+		newNode.getPrev().setNext(newNode);
+		cursor = newNode;
+		if (newNode.getNext() == null)
+		{
+			tail = newNode;
+		}
+	}
+	totalStops++;// increment totalStops of linked list
+	totalDist += newStop.getDistance();//increment total distance
+}
+
+	/**
+	 * Append the newest node to the tail. This method simply places the new node after the tail, 
+	 * and sets the tail equal to the new node.
+	 *
+	 * @param newStop the new stop
+	 * @throws IllegalArgumentException when the new node's value is null.
+	 */
+	public void appendToTail(TripStop newStop) throws IllegalArgumentException 
+	{
+		if (newStop == null) {
+			throw new IllegalArgumentException();
+		}
+
+		TripStopNode newNode = new TripStopNode(newStop);
+
+		if (tail == null || tail == dummy) //ensures that cursor is instantiated
+		{
+			dummy.setNext(newNode);
+			newNode.setPrev(dummy);
+			tail = newNode;
+			cursor = newNode;
+		} else 
+		{
+			tail.setNext(newNode);
+			newNode.setPrev(tail);
+			tail = newNode;
+		}
+		totalStops++;// increment totalStops of linked list
+		totalDist += newStop.getDistance();// increment total distance
+	}
+	
+	/**
+	 * Removes the cursor, by setting the node before cursor to the node previous to cursor. This destroys the reference to cursor, 
+	 * causing it to be removed by garbage collection
+	 *
+	 * @return the removed trip stop
+	 * @throws EndOfListException if the list has no nodes in it.
+	 */
+	public TripStop removeCursor() throws EndOfListException
+	{
+		TripStopNode removedNode = null;
+		if (dummy.getNext() == null)
+		{
+			throw new EndOfListException();
+		}
+		if (cursor == dummy)
+		{
+			cursor = dummy;
+			return null;
+		}
+		if (cursor == tail)
+		{
+			removedNode = tail;
+			tail.getPrev().setNext(null);
+			tail = tail.getPrev();
+			cursor = cursor.getPrev();
+		}
+		else
+		{
+			/*
+			 * set removedNode to current cursor
+			 * cursors previous and next values must now be connected
+			 * while the value cursor was holding is left for garbage collection
+			 * cursor now references previous link
+			 */
+			
+			removedNode = cursor;
+			cursor.getNext().setPrev(cursor.getPrev());
+			cursor.getPrev().setNext(cursor.getNext());
+			if (cursor.getPrev() !=dummy){
+				cursor = cursor.getPrev();
+			}
+		}
+		totalStops--;//decrease list totalStops
+		totalDist -= removedNode.getData().getDistance();
+		return removedNode.getData();
+		
+	}
+	
+	/**
+	 * Clone. Deep copies the stops in the current Itinerary, by taking the data of each tripStop, and creating a new tripStop object,
+	 * then placing that object into the second Itinerary's linked list.
+	 *
+	 * @return the the cloned itinerary
+	 */
+	public Object Clone ()
+	{
+		Itinerary clonedIt = new Itinerary();
+		TripStopNode nodePtr = dummy.getNext();
+		while (nodePtr != null)// 
+			{
+			TripStop clonedStop = (TripStop) nodePtr.getData().Clone();//deep cloning of the tripStop
+			clonedIt.appendToTail(clonedStop);// adding of cloned stop to the linked list
+			nodePtr = nodePtr.getNext();
+		}
+		return clonedIt;
+	}
+	
+	/**
+	 * Prints the all stops, by moving through the linked list, and when the cursor value is reached, 
+	 * the cursor is set to the reference point. This is for correcting the summary.
+	 * 
+	 */
+	public void PrintAllStops()
+	{
+		TripStopNode nodePtr = dummy.getNext();
+		int reference = 0; // help keep track of where cursor is in the list
+		while(nodePtr != null)
+		{
+			if (cursor == null)// this ensures that there is a still a cursor pointer even if there are only append to tail function calls, which does not affect the cursor pointer
+			{
+				cursor = nodePtr;
+			}
+			if (cursor == nodePtr)
+			{
+				System.out.print(">");
+				System.out.println(nodePtr);
+				cursorCount = reference;// the cursor is found and the summary is formatted correctly
+			}
+			else{
+			System.out.println(nodePtr);
+			reference++;//cursor not found, thus there must be more nodes before cursor
+			}
+			nodePtr = nodePtr.getNext();
+			
+		}
+		System.out.println("Summary: This trip has " + getStopsCount() + " stops, totaling " + getTotalDistance() + " miles. " + "There are " + cursorCount + 
+				" stops before the cursor and " + (totalStops-cursorCount-1) + " stops after the cursor" );
+	}
+	
+	
+}

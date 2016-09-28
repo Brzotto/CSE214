@@ -1,0 +1,241 @@
+
+public class Itinerary {
+	private TripStopNode head;
+	private TripStopNode tail;
+	private TripStopNode cursor;
+	private TripStopNode dummy;// an empty node that only contains 
+								//a link to the first link
+	private TripStop dummyStop;
+	private int totalStops = 0;
+	private int cursorCount =0;
+	private int totalDist = 0;
+	
+	public Itinerary() {
+		
+		tail = null;
+		cursor = null;
+		dummyStop = new TripStop("",0,"");
+		dummy = new TripStopNode(dummyStop);
+		head = dummy;// sets head to static position, called dummy
+	}
+
+	public int getStopsCount() {
+		return totalStops;
+	}
+
+	public int getTotalDistance() {
+		return totalDist;
+	}
+
+	public void resetCursorToHead() {
+		if (dummy != null)
+			cursor = dummy.getNext();// resets cursor to node dummy points to, i.e. the first node in the list
+		else
+			cursor = null;
+	}
+	public void moveCursorToTail() {
+		if (tail != null)
+			cursor = tail;// resets cursor to tail node
+		else
+			cursor = null;
+	}
+	public TripStopNode getCursor() throws IllegalArgumentException
+	{
+		if (cursor == null)
+		{
+			throw new IllegalArgumentException();
+		}
+		return cursor;
+	}
+	public TripStopNode getFirst() throws IllegalArgumentException// ask about this
+	{
+		if (dummy.getNext() == null)//if list is empty
+		{
+			throw new IllegalArgumentException();
+		}
+		return dummy.getNext();//return first node NOT the dummy Node
+	}
+	public void cursorFoward() throws EndOfItineraryException
+	{
+		if (cursor == tail) {
+			throw new EndOfItineraryException();
+		}
+		cursor = cursor.getNext();
+	}
+
+	public void cursorBackward() throws EndOfItineraryException {
+		if (cursor == null || cursor.getPrev() == dummy ) {
+			throw new EndOfItineraryException();
+		}
+		cursor = cursor.getPrev();
+	}
+	
+	public void insertBeforeCursor(TripStop newStop) throws IllegalArgumentException
+	{
+	
+	if (newStop == null)//make sure data is present before adding to linked list
+	{
+		throw new IllegalArgumentException();
+	}
+	TripStopNode newNode = new TripStopNode(newStop);
+	if (cursor == null)
+	{
+		newNode.setPrev(dummy);
+		tail = newNode;
+		tail.setPrev(dummy);
+		dummy.setNext(newNode);
+		cursor = newNode;
+	}
+	else if (cursor == dummy)
+	{
+		/*
+		set newStop's previous as dummy,then sets its next to dummy's next
+		this ensures that the linked list is not destroyed from the insertion
+		then dummy's next is set to newStop
+	*/
+	
+		
+		newNode.setPrev(dummy);
+		newNode.setNext(dummy.getNext());
+		
+		if (dummy.getNext()!=null){
+			dummy.getNext().setPrev(newNode);
+		}
+		else {
+			dummy.setNext(newNode);
+		}
+		cursor = newNode;
+		if (newNode.getNext() == null)
+		{
+			tail = newNode;
+		}
+	}
+	
+	else
+	{
+		/*
+		 * set newStop's next to current cursor,
+		 * set newStop's previous to cursorsPrevious
+		 * this again ensures the linked list is not broken
+		 * set newStops previous's next value to newStop. 
+		 */
+		
+		newNode.setNext(cursor);
+		newNode.setPrev(cursor.getPrev());
+		newNode.getNext().setPrev(newNode);
+		newNode.getPrev().setNext(newNode);
+		cursor = newNode;
+		//System.out.println("newNode " + newNode);
+		if (newNode.getNext() == null)
+		{
+			tail = newNode;
+		}
+	}
+	totalStops++;// increment totalStops of linked list
+	totalDist += newStop.getDistance();//increment total distance
+}
+
+	public void appendToTail(TripStop newStop) throws IllegalArgumentException 
+	{
+		if (newStop == null) {
+			throw new IllegalArgumentException();
+		}
+
+		TripStopNode newNode = new TripStopNode(newStop);
+
+		if (tail == null || tail == dummy) //ensures that cursor is instantiated
+		{
+			dummy.setNext(newNode);
+			newNode.setPrev(dummy);
+			tail = newNode;
+			cursor = newNode;
+		} else 
+		{
+			tail.setNext(newNode);
+			newNode.setPrev(tail);
+			tail = newNode;
+		}
+		totalStops++;// increment totalStops of linked list
+		totalDist += newStop.getDistance();// increment total distance
+	}
+	public TripStop removeCursor() throws EndOfListException
+	{
+		TripStopNode removedNode = null;
+		if (dummy.getNext() == null)
+		{
+			throw new EndOfListException();
+		}
+		if (cursor == dummy)
+		{
+			cursor = dummy;
+			return null;
+		}
+		if (cursor == tail)
+		{
+			removedNode = tail;
+			tail.getPrev().setNext(null);
+			tail = tail.getPrev();
+			cursor = cursor.getPrev();
+		}
+		else
+		{
+			/*
+			 * set removedNode to current cursor
+			 * cursors previous and next values must now be connected
+			 * while the value cursor was holding is left for garbage collection
+			 * cursor now references previous link
+			 */
+			
+			removedNode = cursor;
+			cursor.getNext().setPrev(cursor.getPrev());
+			cursor.getPrev().setNext(cursor.getNext());
+			if (cursor.getPrev() !=dummy){
+				cursor = cursor.getPrev();
+			}
+		}
+		totalStops--;//decrease list totalStops
+		totalDist -= removedNode.getData().getDistance();
+		return removedNode.getData();
+		
+	}
+	public Object Clone ()
+	{
+		Itinerary clonedIt = new Itinerary();
+		TripStopNode nodePtr = dummy.getNext();
+		while (nodePtr != null)// 
+			{
+			TripStop clonedStop = (TripStop) nodePtr.getData().Clone();
+			clonedIt.appendToTail(clonedStop);
+			nodePtr = nodePtr.getNext();
+		}
+		return clonedIt;
+	}
+	public void PrintAllStops()
+	{
+		TripStopNode nodePtr = dummy.getNext();
+		int reference = 0; // help keep track of where cursor is in the list
+		while(nodePtr != null)
+		{
+			if (cursor == null)// this ensures that there is a still a cursor pointer even if there are only append to tail function calls, which does not affect the cursor pointer
+			{
+				cursor = nodePtr;
+			}
+			if (cursor == nodePtr)
+			{
+				System.out.print(">");
+				System.out.println(nodePtr);
+				cursorCount = reference;
+			}
+			else{
+			System.out.println(nodePtr);
+			reference++;
+			}
+			nodePtr = nodePtr.getNext();
+			
+		}
+		System.out.println("Summary: This trip has " + getStopsCount() + " stops, totaling " + getTotalDistance() + " miles. " + "There are " + cursorCount + 
+				" stops before the cursor and " + (totalStops-cursorCount-1) + " stops after the cursor" );
+	}
+	
+	
+}

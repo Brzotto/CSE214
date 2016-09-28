@@ -1,0 +1,48 @@
+
+public class TripStop {
+	private String Location;
+	private int Distance;
+	private String Activity;
+	
+	public TripStop() 
+	{
+		Location = "";
+		Distance = 0;
+		Activity = "";		
+	}
+	
+	public TripStop(String Location, int Distance, String Activity) throws IllegalArgumentException
+	{
+		if (Distance < 0)
+		{
+			throw new IllegalArgumentException();
+		}
+		this.Location = Location;
+		this.Distance = Distance;
+		this.Activity = Activity;
+	}
+	public String getLocation()
+	{
+		return Location;
+	}
+	public int getDistance()
+	{
+		return Distance;
+	}
+	public String getActivity()
+	{
+		return Activity;
+	}
+	public void setLocation(String newLoc)
+	{
+		Location = newLoc;
+	}
+	public void setDistace(int newDis)
+	{
+		Distance = newDis;
+	}
+	public void setActivity(String newAct)
+	{
+		Activity = newAct;
+	}
+}

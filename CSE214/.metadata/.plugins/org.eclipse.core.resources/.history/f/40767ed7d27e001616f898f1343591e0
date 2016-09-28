@@ -1,0 +1,148 @@
+import java.util.Scanner;
+
+public class TripPlanner {
+
+	public static void main(String[] args) {
+
+		/*
+		 * 
+		 * F-Cursor forward 
+		 * B-Cursor backward 
+		 * I-Insert before cursor Secondary
+		 * menu asking for Location, Distance, Activity (in that order) 
+		 * A-Append to tail Secondary menu asking for Location, Distance, Activity (in
+		 * that order) 
+		 * D-Delete and move cursor forward 
+		 * H-Cursor to Head
+		 * T-Cursor to Tail 
+		 * E-Edit cursor Secondary menu asking for edits to Location, Distance, Activity (in that order, see sample) 
+		 * S-Switch itinerary O-Insert cursor from other itinerary before cursor from this itinerary (via cloning)
+		 *  R-Replace this itinerary with a copy of the other itinerary 
+		 *  P-Print current itinerary, including summary (see sample)
+		 *   C-Clear current itinerary Q-Quit
+		 */
+		String choice;
+		Scanner sc = new Scanner(System.in);
+		Scanner input = new Scanner(System.in);
+		Itinerary Vacation = new Itinerary();// I dont like typing Itinerary
+		Itinerary cVac = new Itinerary();
+		String location = "", activity = "";
+		int dist = 0;
+		while (true)// infinite loop
+		{
+			System.out.println("Welcome to Zotto's TripPlanner!\n");// for formatting
+			System.out.println("Select an option from the Menu:");
+			System.out.println("F-Cursor forward");
+			System.out.println("B-Cursor backward");
+			System.out.println("I-Insert before cursor");
+			System.out.println("A-Append to tail");
+			System.out.println("D-Delete and move cursor forward");
+			System.out.println("H-Cursor to Head");
+			// System.out.println("T-Cursor to Tail");
+			// System.out.println("E-edit cursor");
+			// /System.out.println("S-Switch itinerary");
+			// System.out.println("O-Inset cursor from other i");
+			System.out.println("Q-Quit");
+			System.out.print("Select an Operation: ");
+
+			choice = sc.nextLine();
+
+			switch (choice.toUpperCase()) {
+			case "F":// need to implement error exceptions
+			{
+				try {
+				Vacation.cursorFoward();
+				System.out.println("Cursor moved forward");
+				}catch(EndOfItineraryException e)
+				{
+					System.out.println("Cursor is at end of list.");
+				}
+				//input.nextLine();
+				break;
+			}
+			case "B":// need to implement error exceptions
+			{
+				try{
+				Vacation.cursorBackward();
+				System.out.println("Cursor moved back");
+				}catch(EndOfItineraryException e)
+				{
+					System.out.println("Cursor is already at begining of list.");
+				}
+				//input.nextLine();
+				break;
+			}
+			case "I":
+			{
+				try{
+				System.out.println("Enter Location: ");
+				location = input.nextLine();
+				System.out.println("Enter Activity: ");
+				activity = input.nextLine();
+				System.out.println("Enter Distance: ");
+				dist= input.nextInt();
+				System.out.println("Added.");
+				input.nextLine();
+				TripStop newStop = new TripStop(location,dist,activity);
+				Vacation.insetBeforeCursor(newStop);
+				}catch(IllegalArgumentException e)
+				{
+					System.out.println("Distance is invalid -- enter value above or equal to 0");
+					//input.nextLine();
+				}
+				
+				//TripStopNode newNode = new TripStopNode(newStop);
+				break;
+				
+			}
+			case "D":
+			{
+				try {
+				Vacation.removeCursor();
+				System.out.println("Deleted cursor.");
+				Vacation.cursorFoward();
+				}catch (EndOfListException e)
+				{
+					System.out.println("End of list.");
+				} catch (EndOfItineraryException e) {
+					// TODO Auto-generated catch block
+					System.out.println();
+				}
+				
+				break;
+			}
+			case "A":
+			{
+				//Vacation.appendToTail(newStop);
+			}
+			case "P":
+			{
+				Vacation.PrintAllStops();
+				cVac.PrintAllStops();
+				break;
+			}
+			case "C":
+			{
+				cVac = (Itinerary) Vacation.Clone();
+				cVac.PrintAllStops();
+				break;
+			}
+			case "T":
+			{
+				System.out.println(Vacation.getTotalDistance());
+				break;
+			}
+			case "Q":
+			{
+				System.exit(0);
+				break;
+			}
+			default:
+			{
+				System.out.println("Option doesnt exist!");
+				break;
+			}
+			}
+		}
+	}
+}

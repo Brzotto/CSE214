@@ -1,0 +1,116 @@
+
+// TODO: Auto-generated Javadoc
+/**
+ * The Class TripStop.
+ */
+public class TripStop {
+	
+	/** The Location. */
+	private String Location;
+	
+	/** The Distance. */
+	private int Distance;
+	
+	/** The Activity. */
+	private String Activity;
+	
+	/**
+	 * Instantiates a new trip stop.
+	 */
+	public TripStop() 
+	{
+		Location = "";
+		Distance = 0;
+		Activity = "";		
+	}
+	
+	/**
+	 * Instantiates a new trip stop.
+	 *
+	 * @param Location the location
+	 * @param Distance the distance
+	 * @param Activity the activity
+	 * @throws IllegalArgumentException the illegal argument exception
+	 */
+	public TripStop(String Location, int Distance, String Activity) throws IllegalArgumentException
+	{
+		if (Distance < 0)
+		{
+			throw new IllegalArgumentException();
+		}
+		this.Location = Location;
+		this.Distance = Distance;
+		this.Activity = Activity;
+	}
+	
+	/**
+	 * Gets the location.
+	 *
+	 * @return the location
+	 */
+	public String getLocation()
+	{
+		return Location;
+	}
+	
+	/**
+	 * Gets the distance.
+	 *
+	 * @return the distance
+	 */
+	public int getDistance()
+	{
+		return Distance;
+	}
+	
+	/**
+	 * Gets the activity.
+	 *
+	 * @return the activity
+	 */
+	public String getActivity()
+	{
+		return Activity;
+	}
+	
+	/**
+	 * Sets the location.
+	 *
+	 * @param newLoc the new location
+	 */
+	public void setLocation(String newLoc)
+	{
+		Location = newLoc;
+	}
+	
+	/**
+	 * Sets the distace.
+	 *
+	 * @param newDis the new distace
+	 */
+	public void setDistace(int newDis)
+	{
+		Distance = newDis;
+	}
+	
+	/**
+	 * Sets the activity.
+	 *
+	 * @param newAct the new activity
+	 */
+	public void setActivity(String newAct)
+	{
+		Activity = newAct;
+	}
+	
+	/**
+	 * Clone.
+	 *
+	 * @return the object
+	 */
+	public Object Clone()
+	{
+		TripStop clonedStop = new TripStop(this.Location,this.Distance,this.Activity);
+		return clonedStop;
+	}
+}
